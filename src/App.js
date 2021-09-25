@@ -35,6 +35,8 @@ class App extends React.Component {
       },
     ],
     selected: "All",
+    iInput: "",
+    iOption: "Code",
   };
 
   uniqueID = () => {
@@ -51,6 +53,32 @@ class App extends React.Component {
       },
       () => console.log(this.state)
     );
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.setState(
+      {
+        tasks: [
+          ...this.state.tasks,
+          { text: this.state.iInput, category: this.state.iOption },
+        ],
+      },
+      () => console.log(this.state)
+    );
+  };
+
+  handleChange = (e) => {
+    this.setState({
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  removeTask = (text) => {
+    const newTasks = this.state.tasks.filter((task) => task.text !== text);
+    this.setState({
+      tasks: newTasks,
+    });
   };
 
   render() {
@@ -88,11 +116,45 @@ class App extends React.Component {
         </div>
         <div className="tasks">
           <h5>Tasks</h5>
+          <form className="new-task-form" onSubmit={this.handleSubmit}>
+            <input
+              placeholder="New Task details"
+              type="text"
+              id="iInput"
+              value={this.state.iInput}
+              onChange={this.handleChange}
+            />
+            <select
+              name="iOption"
+              id="iOption"
+              onChange={this.handleChange}
+              value={this.state.iOption}
+            >
+              {CATEGORIES.map((category) => {
+                if (category !== "All") {
+                  return (
+                    <option key={this.uniqueID()} value={category}>
+                      {category}
+                    </option>
+                  );
+                } else {
+                  return null;
+                }
+              })}
+            </select>
+            <input type="submit" value="Add task" />
+          </form>
           <div>
             {filteredTasks.map((task) => (
               <div className="task" key={this.uniqueID()}>
                 <div className="label">{task.category}</div>
                 <div className="text">{task.text}</div>
+                <button
+                  className="delete"
+                  onClick={() => this.removeTask(task.text)}
+                >
+                  X
+                </button>
               </div>
             ))}
           </div>
